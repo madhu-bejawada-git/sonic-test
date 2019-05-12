@@ -1,0 +1,49 @@
+@startuml
+participant Client as c #99FF99
+participant "REST API" as api #99ddff
+database DB
+alt create video successful case
+c->api:POST /video
+api->api: validate
+api->DB:save(video)
+DB->api:Video
+api->c:video(id)
+else validation fail
+api->c:please provide title (error code 400)
+end
+
+alt Find video successful case
+c->api:GET /video/{id}
+api->DB:FindVideoById
+DB->api:Video
+api->c:Video(id, title)
+else Video id is not found of failure
+api->c:Video id is not found (error code 404)
+end
+
+alt Report playback video successful case
+c->api:POST /video/{id}/playbackReport
+api->DB:find video by id
+DB->api: Video
+api->api:increment video count
+api->DB:save(video)
+api->c: success code (200)
+else Video id is not found of failure
+api->c:Video id is not found (error code 404)
+end
+
+alt Find playback info successful case
+c->api:GET /video/{id}/playbackInfo
+api->DB:FindPLaybackVideoById
+DB->api:Video
+api->c:count
+else Video id is not found of failure
+api->c:Video id is not found (error code 404)
+end
+
+
+
+
+
+
+@enduml
